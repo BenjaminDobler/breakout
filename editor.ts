@@ -2,13 +2,16 @@ import { GemType, brickColors } from './types';
 
 console.log('editor');
 
+
+const grids = [];
+let selectedGrid;
+
 const height = 600;
 const width = 800;
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 const context = canvas.getContext('2d');
 
-let rows = 0;
-let cols = 0;
+
 
 const apply = document.querySelector('#apply');
 const selectMode = document.querySelector('#selectMode') as HTMLInputElement;
@@ -18,25 +21,29 @@ const gemSelect = document.querySelector('#gemSelect') as HTMLSelectElement;
 const exportButton = document.querySelector('#expot_btn') as HTMLButtonElement;
 
 exportButton.addEventListener('click', () => {
-    const bs = bricks
-        .filter((b) => b.selected)
-        .map((b) => {
-            const c = { ...b };
-            delete c.width;
-            delete c.height;
-            delete c.x;
-            delete c.y;
-            delete c.selected;
-            return c;
-        });
+    const d = [];
+    for(let grid of grids) {
+        const bs = grid.bricks
+            .filter((b) => b.selected)
+            .map((b) => {
+                const c = { ...b };
+                delete c.width;
+                delete c.height;
+                delete c.x;
+                delete c.y;
+                delete c.selected;
+                return c;
+            });
 
-    const data = {
-        rows: rows,
-        cols: cols,
-        bricks: bs,
-    };
+        const data = {
+            rows: grid.rows,
+            cols: grid.cols,
+            bricks: bs,
+        };
+        d.push(data)
+    }
 
-    console.log(JSON.stringify(data, null, 2));
+    console.log(JSON.stringify({grids: d}, null, 2));
 });
 
 gemSelect.addEventListener('change', () => {
@@ -49,14 +56,15 @@ gemSelect.addEventListener('change', () => {
 let selectedBrick;
 
 canvas.addEventListener('click', (e) => {
+    const bricks = selectedGrid.bricks;
     const rect = canvas.getBoundingClientRect();
     const x = e.pageX - rect.left;
     const y = e.pageY - rect.top;
 
-    const xPos = Math.floor(x / (width / cols));
-    const yPos = Math.floor(y / (height / rows));
+    const xPos = Math.floor(x / (width / selectedGrid.cols));
+    const yPos = Math.floor(y / (height / selectedGrid.rows));
 
-    const index = yPos * cols + xPos;
+    const index = yPos * selectedGrid.cols + xPos;
     bricks[index].selected = selectMode.checked;
     selectedBrick = bricks[index];
 
@@ -64,27 +72,31 @@ canvas.addEventListener('click', (e) => {
 
     render();
 });
-let bricks = [];
+
 apply.addEventListener('click', () => {
-    console.log('on apply ');
-    rows = parseInt((document.querySelector('#rows-tx') as HTMLInputElement).value);
-    cols = parseInt((document.querySelector('#cols-tx') as HTMLInputElement).value);
-    bricks = [];
-    for (var r = 0; r < rows; r++) {
-        for (var c = 0; c < cols; c++) {
+    const newGrid: any = {};
+    newGrid.rows = parseInt((document.querySelector('#rows-tx') as HTMLInputElement).value);
+    newGrid.cols = parseInt((document.querySelector('#cols-tx') as HTMLInputElement).value);
+    const bricks = [];
+    for (var r = 0; r < newGrid.rows; r++) {
+        for (var c = 0; c < newGrid.cols; c++) {
             bricks.push({
                 r: r,
                 c: c,
-                y: r * (height / rows),
-                x: c * (width / cols),
-                width: width / cols,
-                height: height / rows,
+                y: r * (height / newGrid.rows),
+                x: c * (width / newGrid.cols),
+                width: width / newGrid.cols,
+                height: height / newGrid.rows,
                 selected: false,
                 gemType: GemType.NONE,
                 strength: 1,
             });
         }
     }
+    newGrid.bricks = bricks;
+    grids.push(newGrid);
+    selectedGrid = newGrid;
+
 
     render();
 });
@@ -100,19 +112,28 @@ function render() {
     context.fillStyle = '#000000';
     context.fillStyle = '#999999';
 
-    for (let brick of bricks) {
-        if (brick.selected) {
-            context.fillStyle = brickColors[brick.gemType];
-        } else {
-            context.fillStyle = '#999999';
-        }
 
-        context.beginPath();
-        context.lineWidth = 1;
-        context.rect(brick.x, brick.y, brick.width, brick.height);
-        context.fill();
-        context.stroke();
-        context.closePath();
+    for(let grid of grids) {
+        const bricks = grid.bricks;
+        for (let brick of bricks) {
+            if (brick.selected) {
+                context.fillStyle = brickColors[brick.gemType];
+            } else {
+                context.fillStyle = '';
+            }
+
+            context.beginPath();
+            context.lineWidth = 1;
+            context.rect(brick.x, brick.y, brick.width, brick.height);
+            if (brick.selected) {
+                context.fill();
+                context.stroke();
+            }
+            if (grid === selectedGrid) {
+                context.stroke();
+            }
+            context.closePath();
+        }
     }
 
     if (selectedBrick) {
@@ -126,4 +147,6 @@ function render() {
         context.stroke();
         context.closePath();
     }
+
+
 }
