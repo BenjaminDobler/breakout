@@ -209,3 +209,6 @@ export function createGrid(width, height, rows, colums) {
 
     return bricks;
 }
+
+
+export const levelData = [gridData, gridData2];
