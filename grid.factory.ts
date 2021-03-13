@@ -72,7 +72,7 @@ export const gridData2 = {
         {
             r: 4,
             c: 5,
-            gemType: 4,
+            gemType: 5,
             strength: 1,
         },
         {
@@ -84,7 +84,7 @@ export const gridData2 = {
         {
             r: 4,
             c: 7,
-            gemType: 4,
+            gemType: 5,
             strength: 1,
         },
         {
@@ -120,7 +120,7 @@ export const gridData2 = {
         {
             r: 5,
             c: 7,
-            gemType: 3,
+            gemType: 5,
             strength: 1,
         },
         {
