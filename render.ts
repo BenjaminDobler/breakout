@@ -1,4 +1,14 @@
-export function render(context, canvas, brickColors, bgPattern, d) {
+import { Particles } from "./particles";
+
+export function render(canvas, brickColors, d) {
+
+    
+    const context = canvas.getContext('2d')
+
+    if(!d.particles) {
+        d.particles = new Particles(context);
+    }
+
     context.clearRect(0, 0, canvas.width, canvas.height)
 
     // context.beginPath();
