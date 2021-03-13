@@ -1,4 +1,3 @@
-
 export const gridData2 = {
   grids: [
     {
@@ -6,14 +5,56 @@ export const gridData2 = {
       cols: 20,
       bricks: [
         {
-          r: 2,
-          c: 14,
+          r: 3,
+          c: 2,
           gemType: 4,
           strength: 1,
         },
         {
           r: 3,
+          c: 3,
+          gemType: 3,
+          strength: 1,
+        },
+        {
+          r: 3,
           c: 4,
+          gemType: 2,
+          strength: 1,
+        },
+        {
+          r: 3,
+          c: 5,
+          gemType: 1,
+          strength: 1,
+        },
+        {
+          r: 3,
+          c: 6,
+          gemType: 4,
+          strength: 1,
+        },
+        {
+          r: 3,
+          c: 7,
+          gemType: 4,
+          strength: 1,
+        },
+        {
+          r: 3,
+          c: 8,
+          gemType: 4,
+          strength: 1,
+        },
+        {
+          r: 3,
+          c: 9,
+          gemType: 4,
+          strength: 1,
+        },
+        {
+          r: 4,
+          c: 7,
           gemType: 4,
           strength: 1,
         },
@@ -24,44 +65,134 @@ export const gridData2 = {
           strength: 1,
         },
         {
-          r: 9,
-          c: 15,
+          r: 6,
+          c: 5,
           gemType: 4,
           strength: 1,
         },
         {
-          r: 11,
-          c: 9,
+          r: 6,
+          c: 7,
           gemType: 4,
           strength: 1,
         },
       ],
     },
     {
-      rows: 10,
+      rows: 20,
       cols: 10,
       bricks: [
         {
-          r: 0,
+          r: 9,
+          c: 1,
+          gemType: 4,
+          strength: 1,
+        },
+        {
+          r: 9,
+          c: 2,
+          gemType: 4,
+          strength: 1,
+        },
+        {
+          r: 9,
           c: 3,
           gemType: 4,
           strength: 1,
         },
         {
-          r: 1,
-          c: 9,
+          r: 9,
+          c: 4,
           gemType: 4,
           strength: 1,
         },
         {
-          r: 3,
-          c: 6,
+          r: 9,
+          c: 5,
+          gemType: 4,
+          strength: 1,
+        },
+      ],
+    },
+    {
+      rows: 30,
+      cols: 30,
+      bricks: [
+        {
+          r: 8,
+          c: 22,
           gemType: 4,
           strength: 1,
         },
         {
-          r: 4,
-          c: 0,
+          r: 8,
+          c: 23,
+          gemType: 4,
+          strength: 1,
+        },
+        {
+          r: 8,
+          c: 24,
+          gemType: 4,
+          strength: 1,
+        },
+        {
+          r: 8,
+          c: 25,
+          gemType: 4,
+          strength: 1,
+        },
+        {
+          r: 8,
+          c: 26,
+          gemType: 4,
+          strength: 1,
+        },
+        {
+          r: 8,
+          c: 27,
+          gemType: 4,
+          strength: 1,
+        },
+        {
+          r: 8,
+          c: 28,
+          gemType: 4,
+          strength: 1,
+        },
+        {
+          r: 9,
+          c: 25,
+          gemType: 4,
+          strength: 1,
+        },
+        {
+          r: 10,
+          c: 25,
+          gemType: 4,
+          strength: 1,
+        },
+        {
+          r: 11,
+          c: 25,
+          gemType: 4,
+          strength: 1,
+        },
+        {
+          r: 12,
+          c: 25,
+          gemType: 4,
+          strength: 1,
+        },
+        {
+          r: 13,
+          c: 25,
+          gemType: 4,
+          strength: 1,
+        },
+        {
+          r: 14,
+          c: 25,
           gemType: 4,
           strength: 1,
         },
@@ -71,7 +202,6 @@ export const gridData2 = {
 };
 
 export const gridData = gridData2;
-
 
 export function createGridFromData(width, height, data) {
   const bricks = [];

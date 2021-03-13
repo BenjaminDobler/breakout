@@ -1,83 +1,86 @@
-import { GemType, brickColors } from './types';
+import { GemType, brickColors } from './types'
 
-console.log('editor');
+console.log('editor')
 
+let grids = []
+let selectedGrid
 
-const grids = [];
-let selectedGrid;
+const height = 600
+const width = 800
+const canvas = document.getElementById('canvas') as HTMLCanvasElement
+const context = canvas.getContext('2d')
 
-const height = 600;
-const width = 800;
-const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-const context = canvas.getContext('2d');
+const apply = document.querySelector('#apply')
+const selectMode = document.querySelector('#selectMode') as HTMLInputElement
 
+const gemSelect = document.querySelector('#gemSelect') as HTMLSelectElement
 
+const exportButton = document.querySelector('#expot_btn') as HTMLButtonElement
 
-const apply = document.querySelector('#apply');
-const selectMode = document.querySelector('#selectMode') as HTMLInputElement;
-
-const gemSelect = document.querySelector('#gemSelect') as HTMLSelectElement;
-
-const exportButton = document.querySelector('#expot_btn') as HTMLButtonElement;
+const gridList = document.querySelector('#gridList')
 
 exportButton.addEventListener('click', () => {
-    const d = [];
-    for(let grid of grids) {
+    const d = []
+    for (let grid of grids) {
         const bs = grid.bricks
             .filter((b) => b.selected)
             .map((b) => {
-                const c = { ...b };
-                delete c.width;
-                delete c.height;
-                delete c.x;
-                delete c.y;
-                delete c.selected;
-                return c;
-            });
+                const c = { ...b }
+                delete c.width
+                delete c.height
+                delete c.x
+                delete c.y
+                delete c.selected
+                return c
+            })
 
         const data = {
             rows: grid.rows,
             cols: grid.cols,
             bricks: bs,
-        };
+        }
         d.push(data)
     }
 
-    console.log(JSON.stringify({grids: d}, null, 2));
-});
+    console.log(JSON.stringify({ grids: d }, null, 2))
+})
 
 gemSelect.addEventListener('change', () => {
     if (selectedBrick) {
-        selectedBrick.gemType = gemSelect.selectedIndex;
-        render();
+        selectedBrick.gemType = gemSelect.selectedIndex
+        render()
     }
-});
+})
 
-let selectedBrick;
+let selectedBrick
 
 canvas.addEventListener('click', (e) => {
-    const bricks = selectedGrid.bricks;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.pageX - rect.left;
-    const y = e.pageY - rect.top;
+    const bricks = selectedGrid.bricks
+    const rect = canvas.getBoundingClientRect()
+    const x = e.pageX - rect.left
+    const y = e.pageY - rect.top
 
-    const xPos = Math.floor(x / (width / selectedGrid.cols));
-    const yPos = Math.floor(y / (height / selectedGrid.rows));
+    const xPos = Math.floor(x / (width / selectedGrid.cols))
+    const yPos = Math.floor(y / (height / selectedGrid.rows))
 
-    const index = yPos * selectedGrid.cols + xPos;
-    bricks[index].selected = selectMode.checked;
-    selectedBrick = bricks[index];
+    const index = yPos * selectedGrid.cols + xPos
+    bricks[index].selected = selectMode.checked
+    selectedBrick = bricks[index]
 
-    gemSelect.selectedIndex = selectedBrick.gemType;
+    gemSelect.selectedIndex = selectedBrick.gemType
 
-    render();
-});
+    render()
+})
 
 apply.addEventListener('click', () => {
-    const newGrid: any = {};
-    newGrid.rows = parseInt((document.querySelector('#rows-tx') as HTMLInputElement).value);
-    newGrid.cols = parseInt((document.querySelector('#cols-tx') as HTMLInputElement).value);
-    const bricks = [];
+    const newGrid: any = {}
+    newGrid.rows = parseInt(
+        (document.querySelector('#rows-tx') as HTMLInputElement).value
+    )
+    newGrid.cols = parseInt(
+        (document.querySelector('#cols-tx') as HTMLInputElement).value
+    )
+    const bricks = []
     for (var r = 0; r < newGrid.rows; r++) {
         for (var c = 0; c < newGrid.cols; c++) {
             bricks.push({
@@ -90,63 +93,106 @@ apply.addEventListener('click', () => {
                 selected: false,
                 gemType: GemType.NONE,
                 strength: 1,
-            });
+            })
         }
     }
-    newGrid.bricks = bricks;
-    grids.push(newGrid);
-    selectedGrid = newGrid;
+    newGrid.bricks = bricks
+    grids.push(newGrid)
+    selectedGrid = newGrid
 
+    console.log('grids ', grids)
+    buildGridList()
+    render()
+})
 
-    render();
-});
+function buildGridList() {
+    while (gridList.lastElementChild) {
+        gridList.removeChild(gridList.lastElementChild)
+    }
+    for (const grid of grids) {
+        const li = document.createElement('li')
+        const btn = document.createElement('button') as HTMLButtonElement
+        const span = document.createElement('span')
+        span.textContent = `Grid ${grid.rows} x ${grid.cols}`
+        btn.textContent = 'Delete'
+        btn.onclick = () => {
+            console.log('Delete')
+            grids = grids.filter((x) => x !== grid)
+            buildGridList()
+            render()
+        }
+        li.appendChild(btn)
+        li.appendChild(span)
+        //li.textContent = `Grid ${grid.rows} x ${grid.cols}`;
+        span.onclick = () => {
+            console.log('clic ', grid)
+            li.classList.add('selected')
+            if (selectedLi) {
+                selectedLi.classList.remove('selected')
+            }
+            selectedGrid = grid
+            selectedLi = li
+            render()
+        }
+        if (selectedGrid === grid) {
+            li.classList.add('selected')
+            selectedLi = li
+        }
+        gridList.appendChild(li)
+        console.log('append child ')
+    }
+}
+
+let selectedLi
 
 function render() {
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.clearRect(0, 0, canvas.width, canvas.height)
 
-    context.beginPath();
+    context.beginPath()
 
-    context.lineWidth = 1;
-    context.strokeStyle = '#000000';
+    context.lineWidth = 1
+    context.strokeStyle = '#000000'
 
-    context.fillStyle = '#000000';
-    context.fillStyle = '#999999';
+    context.fillStyle = '#000000'
+    context.fillStyle = '#999999'
 
-
-    for(let grid of grids) {
-        const bricks = grid.bricks;
+    for (let grid of grids) {
+        const bricks = grid.bricks
         for (let brick of bricks) {
             if (brick.selected) {
-                context.fillStyle = brickColors[brick.gemType];
+                context.fillStyle = brickColors[brick.gemType]
             } else {
-                context.fillStyle = '';
+                context.fillStyle = ''
             }
 
-            context.beginPath();
-            context.lineWidth = 1;
-            context.rect(brick.x, brick.y, brick.width, brick.height);
+            context.beginPath()
+            context.lineWidth = 1
+            context.rect(brick.x, brick.y, brick.width, brick.height)
             if (brick.selected) {
-                context.fill();
-                context.stroke();
+                context.fill()
+                context.stroke()
             }
             if (grid === selectedGrid) {
-                context.stroke();
+                context.stroke()
             }
-            context.closePath();
+            context.closePath()
         }
     }
 
     if (selectedBrick) {
         //context.fillStyle = '999999';
-        context.beginPath();
-        context.strokeStyle = '#00ff00';
+        context.beginPath()
+        context.strokeStyle = '#00ff00'
 
-        context.lineWidth = 3;
-        context.rect(selectedBrick.x, selectedBrick.y, selectedBrick.width, selectedBrick.height);
+        context.lineWidth = 3
+        context.rect(
+            selectedBrick.x,
+            selectedBrick.y,
+            selectedBrick.width,
+            selectedBrick.height
+        )
         // context.fill();
-        context.stroke();
-        context.closePath();
+        context.stroke()
+        context.closePath()
     }
-
-
 }

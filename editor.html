@@ -1,16 +1,17 @@
 <html>
-
-<head>
-    <style>
-        body {
-        }
-    </style>
-</head>
+    <head>
+        <style>
+            body {
+            }
+            ul .selected {
+                font-weight: bold;
+            }
+        </style>
+    </head>
     <body>
-
-        <label>rows</label><input value="20" id="rows-tx" type="number" >
-        <label>cols</label><input value="20" id="cols-tx" type="number" >
-        <input id="selectMode" type="checkbox" value="true">
+        <label>rows</label><input value="20" id="rows-tx" type="number" />
+        <label>cols</label><input value="20" id="cols-tx" type="number" />
+        <input id="selectMode" type="checkbox" value="true" />
         <button id="expot_btn">Export</button>
 
         <select id="gemSelect">
@@ -19,8 +20,13 @@
             <option value="3">PADDLE_GROW</option>
             <option value="4">PADDLE_SHRINK</option>
             <option value="5">NONE</option>
+            <option value="5">EXTRA_BALL</option>
         </select>
+        <label>Strength</label><input value="0" id="strength" type="number" />
+
         <button id="apply">Apply</button>
+
+        <ul id="gridList"></ul>
 
         <canvas width="800" height="600" id="canvas"></canvas>
         <script src="./editor.ts"></script>
