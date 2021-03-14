@@ -3,8 +3,10 @@ import {
     BoxGeometry,
     DoubleSide,
     EdgesGeometry,
+    Group,
     LineBasicMaterial,
     LineSegments,
+    MathUtils,
     Mesh,
     MeshBasicMaterial,
     MeshLambertMaterial,
@@ -13,8 +15,12 @@ import {
     PointLight,
     Scene,
     SphereGeometry,
+    SpotLight,
     WebGLRenderer,
 } from 'three'
+import { OrbitControls } from 'three-orbitcontrols-ts'
+import { Wall } from './objects/wall'
+
 import { brickColors } from './types'
 
 function addEdges(b) {
@@ -38,12 +44,16 @@ class ThreeRenderer {
     brickMap: Map<any, any> = new Map<any, any>()
     gemMap: Map<any, any> = new Map<any, any>()
 
+    group: Group
+
     init(canvas, width, height, state) {
+        this.group = new Group()
+
         this.scene = new Scene()
 
-        this.camera = new PerspectiveCamera(100, width / height, 0.1, 2000)
+        this.camera = new PerspectiveCamera(80, width / height, 0.1, 2000)
 
-        this.renderer = new WebGLRenderer({ canvas: canvas })
+        this.renderer = new WebGLRenderer({ canvas: canvas, antialias: true })
         this.renderer.setSize(width, height)
         // document.body.appendChild(renderer.domElement)
 
@@ -53,12 +63,14 @@ class ThreeRenderer {
         })
 
         this.ball = new Mesh(ballGeometry, ballMaterial)
-        this.scene.add(this.ball)
+        this.group.add(this.ball)
 
         const geometry: BoxGeometry = new BoxGeometry(
             state.paddle.width,
             state.paddle.height,
-            30
+            30,
+            20,
+            20,
         )
         const material: MeshLambertMaterial = new MeshLambertMaterial({
             color: 0x00ff00,
@@ -66,13 +78,13 @@ class ThreeRenderer {
 
         this.paddle = new Mesh(geometry, material)
         addEdges(this.paddle)
-        this.scene.add(this.paddle)
+        this.group.add(this.paddle)
 
         for (const brick of state.bricks) {
             const brickGeometry: BoxGeometry = new BoxGeometry(
                 brick.width,
                 brick.height,
-                30
+                30,
             )
             const brickMaterial: MeshLambertMaterial = new MeshLambertMaterial({
                 color: brickColors[brick.gemType],
@@ -80,10 +92,10 @@ class ThreeRenderer {
 
             const b = new Mesh(brickGeometry, brickMaterial)
 
-            b.position.x = brick.x + brick.width / 2;
-            b.position.y = state.height - brick.y
+            b.position.x = brick.x + brick.width / 2
+            b.position.y = state.height - (brick.y + brick.height / 2)
             addEdges(b)
-            this.scene.add(b)
+            this.group.add(b)
             this.brickMap.set(brick.id, b)
             this.bricks.push(b)
         }
@@ -97,46 +109,68 @@ class ThreeRenderer {
         plane.position.z = -30
         plane.position.x = state.width / 2
         plane.position.y = state.height / 2
-        this.scene.add(plane)
+        this.group.add(plane)
 
-        var geoSide = new PlaneBufferGeometry(100, height, 8, 8)
+        const bottom = new Wall(state.width)
+        bottom.position.x = state.width / 2
+        this.group.add(bottom)
 
-        var left = new Mesh(geoSide, mat)
-        left.position.z = -30
-        left.position.x = 0
-        left.position.y = state.height / 2
+        const top = new Wall(state.width)
+        top.position.x = state.width / 2
+        top.position.y = state.height
+        this.group.add(top)
 
-        left.rotateY(90)
-        addEdges(left)
+        const leftW = new Wall(state.height)
+        leftW.position.x = 0
+        leftW.position.y = state.height / 2
+        leftW.rotateZ(MathUtils.degToRad(90))
+        this.group.add(leftW)
 
-        this.scene.add(left)
+        const rightW = new Wall(state.height)
+        rightW.position.x = state.width
+        rightW.position.y = state.height / 2
+        rightW.rotateZ(MathUtils.degToRad(90))
+        this.group.add(rightW)
 
-        var right = new Mesh(geoSide, mat)
-        right.position.z = -30
-        right.position.x = state.width
-        right.position.y = state.height / 2
+        //this.scene.add(new AmbientLight(0xffffff, 0.5))
+        //this.scene.add(new PointLight(0xffffff, 0.1))
 
-        right.rotateY(90)
-        addEdges(right)
+        const controls = new OrbitControls(
+            this.camera,
+            this.renderer.domElement,
+        )
+        controls.enableZoom = true
 
-        this.scene.add(right)
+        const amb = new AmbientLight(0x444444);
+        this.scene.add(amb)
 
-        this.scene.add(plane)
+        const light = new SpotLight(0xffffff);
+        this.scene.add(light);
+        light.position.set(state.width / 2, state.height / 2, 400);
+        light.castShadow = false;
+        light.shadow.mapSize.width = 1024;
+        light.shadow.mapSize.height = 1024;
+        light.shadow.camera.near = 1;
+        light.shadow.camera.far = 2000;
+        light.shadow.camera.fov = 20;
 
-        this.scene.add(new AmbientLight(0xffffff, 0.5))
-        this.scene.add(new PointLight(0xffffff, 0.1))
+        this.camera.position.set(0, 0, 500.0)
+        this.camera.lookAt(0,0, 0.0)
+        controls.update()
 
-        this.camera.position.set(state.width / 2, state.height / 2, 300.0)
-        this.camera.lookAt(state.width / 2, state.height / 2, 0.0)
+        this.scene.add(this.group)
 
-        // this.scene.rotateX(40);
+        this.group.position.x = -state.width / 2
+        this.group.position.y = -state.height / 2
+
+        //this.scene.rotateX(40);
     }
 
     addGem(gem, state) {
         const brickGeometry: BoxGeometry = new BoxGeometry(
             gem.width,
             gem.height,
-            30
+            30,
         )
         const brickMaterial: MeshLambertMaterial = new MeshLambertMaterial({
             color: brickColors[gem.gemType],
@@ -147,14 +181,14 @@ class ThreeRenderer {
         b.position.x = gem.x
         b.position.y = state.height - gem.y
         addEdges(b)
-        this.scene.add(b)
+        this.group.add(b)
         this.gemMap.set(gem.id, b)
     }
 
     render(state) {
         for (const brick of state.bricks) {
             if (brick.hit && !this.removed.has(brick.id)) {
-                this.scene.remove(this.brickMap.get(brick.id))
+                this.group.remove(this.brickMap.get(brick.id))
                 this.removed.set(brick.id, true)
             }
         }
@@ -168,15 +202,15 @@ class ThreeRenderer {
             }
 
             if (gem.out && !this.removed.has(gem.id)) {
-                this.scene.remove(this.gemMap.get(gem.id))
+                this.group.remove(this.gemMap.get(gem.id))
                 this.removed.set(gem.id, gem)
             }
         }
 
-        this.paddle.position.x = state.paddle.x + state.paddle.width / 2;
+        this.paddle.position.x = state.paddle.x + state.paddle.width / 2
         this.paddle.position.y = state.height - state.paddle.y
         this.ball.position.y = state.height - state.ball.y
-        this.ball.position.x = state.ball.x + state.ball.radius;
+        this.ball.position.x = state.ball.x + state.ball.radius
         this.renderer.render(this.scene, this.camera)
     }
 }
@@ -189,6 +223,7 @@ export function render(canvas, brickColors, d) {
     if (!isInited) {
         r.init(canvas, d.width, d.height, d)
         isInited = true
+        //r.render(d)
     } else {
         r.render(d)
     }
