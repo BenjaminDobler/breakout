@@ -29,7 +29,7 @@ export function render(canvas, brickColors, d) {
     // draw the paddle
     context.beginPath()
     context.rect(
-        d.paddle.x - d.paddle.width / 2,
+        d.paddle.x,
         context.canvas.height - d.paddle.height,
         d.paddle.width,
         d.paddle.height

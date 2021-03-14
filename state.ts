@@ -1,4 +1,5 @@
 import { GemType } from './types'
+import { getId } from './util'
 
 function collision(brick, ball) {
     return (
@@ -35,8 +36,8 @@ export function calculateState(acc, [[tick, pos], shoot]) {
         acc.state === 'GAME_OVER'
     ) {
         acc.paddle.x = pos
-        acc.ball.x = acc.paddle.x
-        acc.ball.y = acc.paddle.y
+        acc.ball.x = acc.paddle.x + acc.paddle.width / 2;
+        acc.ball.y = acc.paddle.y - 30
         if (shoot) {
             acc.state = 'RUNNING'
         }
@@ -78,11 +79,12 @@ export function calculateState(acc, [[tick, pos], shoot]) {
         acc.ball.y += acc.ball.speed * acc.ball.directionY
 
         if (
-            acc.ball.x > acc.paddle.x - acc.paddle.width / 2 &&
-            acc.ball.x < acc.paddle.x + acc.paddle.width / 2 &&
+            acc.ball.x > acc.paddle.x &&
+            acc.ball.x < acc.paddle.x + acc.paddle.width &&
             acc.ball.y > acc.height - acc.paddle.height - acc.ball.radius / 2
         ) {
-            let collidePoint = acc.ball.x - acc.paddle.x
+            let collidePoint = acc.ball.x - acc.paddle.x;
+            collidePoint = collidePoint - acc.paddle.width / 2;
             collidePoint = collidePoint / (acc.paddle.width / 2)
             const angle = (collidePoint * Math.PI) / 3
             acc.ball.directionX = acc.ball.speed * Math.sin(angle)
@@ -111,6 +113,7 @@ export function calculateState(acc, [[tick, pos], shoot]) {
                         color: brick.color,
                         out: false,
                         type: brick.gemType,
+                        id: getId()
                     })
                 }
             }

@@ -1,3 +1,5 @@
+import { getId } from "./util";
+
 export const gridData2 = {
   grids: [
     {
@@ -216,6 +218,7 @@ export function createGridFromData(width, height, data) {
       b.height = h;
       b.x = w * b.c;
       b.y = h * b.r;
+      b.id = getId();
       delete b.r;
       delete b.c;
       bricks.push(b);

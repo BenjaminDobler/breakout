@@ -16,9 +16,7 @@ import { GemType, brickColors } from './types'
 
 console.log('init')
 
-const render = webglrenderer; // canvasRenderer;
-
-
+const render = webglrenderer; //canvasRenderer;// webglrenderer; //canvasRenderer; //webglrenderer;
 
 const height = 600
 const width = 800
@@ -142,5 +140,3 @@ img.onload = () => {
     // bgPattern = context.createPattern(img, 'repeat') // Create a pattern with this image, and set it to "repeat".
     render(canvas, brickColors, data)
 }
-
-
