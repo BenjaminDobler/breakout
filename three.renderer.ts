@@ -107,7 +107,7 @@ class ThreeRenderer {
             side: DoubleSide
         })
         var plane = new Mesh(geo, mat)
-        plane.position.z = -30
+        plane.position.z = -16;
         plane.position.x = state.width / 2
         plane.position.y = state.height / 2
         this.group.add(plane)
@@ -121,14 +121,14 @@ class ThreeRenderer {
         top.position.y = state.height
         this.group.add(top)
 
-        const leftW = new Wall(state.height)
-        leftW.position.x = 0
+        const leftW = new Wall(state.height + 20)
+        leftW.position.x = -10;
         leftW.position.y = state.height / 2
         leftW.rotateZ(MathUtils.degToRad(90))
         this.group.add(leftW)
 
-        const rightW = new Wall(state.height)
-        rightW.position.x = state.width
+        const rightW = new Wall(state.height + 20)
+        rightW.position.x = state.width + 10
         rightW.position.y = state.height / 2
         rightW.rotateZ(MathUtils.degToRad(90))
         this.group.add(rightW)
