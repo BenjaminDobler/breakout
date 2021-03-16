@@ -16,7 +16,7 @@ import { GemType, brickColors } from './types';
 
 console.log('init');
 
-const render = canvasRenderer;//webglrenderer; //canvasRenderer;// webglrenderer; //canvasRenderer; //webglrenderer;
+const render = webglrenderer; //canvasRenderer;// webglrenderer; //canvasRenderer; //webglrenderer;
 
 const height = 700;
 const width = 1000;
