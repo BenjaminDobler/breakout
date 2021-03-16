@@ -41,10 +41,8 @@ class ThreeRenderer {
     ball: Mesh;
     bricks: Mesh[] = [];
 
+    existing: Map<any, any> = new Map<any, any>();
     removed: Map<any, any> = new Map<any, any>();
-
-    brickMap: Map<any, any> = new Map<any, any>();
-    gemMap: Map<any, any> = new Map<any, any>();
 
     group: Group;
 
@@ -98,7 +96,7 @@ class ThreeRenderer {
             b.position.y = state.height - (brick.y + brick.height / 2);
             addEdges(b, brickColors[brick.gemType]);
             this.group.add(b);
-            this.brickMap.set(brick.id, b);
+            this.existing.set(brick.id, b);
             this.bricks.push(b);
         }
 
@@ -169,12 +167,6 @@ class ThreeRenderer {
     }
 
     addGem(gem, state) {
-        // const brickGeometry: BoxGeometry = new BoxGeometry(
-        //     gem.width,
-        //     gem.height,
-        //     30
-        // )
-
         const brickGeometry = new IcosahedronGeometry(16);
         const brickMaterial: MeshLambertMaterial = new MeshLambertMaterial({
             color: brickColors[gem.gemType]
@@ -186,9 +178,23 @@ class ThreeRenderer {
         b.position.y = state.height - gem.y;
         gem.rotY = 0;
         gem.rotX = 0;
-        // addEdges(b)
         this.group.add(b);
-        this.gemMap.set(gem.id, b);
+        this.existing.set(gem.id, b);
+    }
+
+    addShoot(shoot, state) {
+        const brickGeometry: BoxBufferGeometry = new BoxGeometry(10, 10, 10);
+
+        const brickMaterial: MeshLambertMaterial = new MeshLambertMaterial({
+            color: '#ff0000'
+        });
+
+        const b = new Mesh(brickGeometry, brickMaterial);
+
+        b.position.x = shoot.x;
+        b.position.y = state.height - shoot.y;
+        this.group.add(b);
+        this.existing.set(shoot.id, b);
     }
 
     rotX = 0;
@@ -198,16 +204,16 @@ class ThreeRenderer {
         // this.rotY+=.5;
         for (const brick of state.bricks) {
             if (brick.hit && !this.removed.has(brick.id)) {
-                this.group.remove(this.brickMap.get(brick.id));
+                this.group.remove(this.existing.get(brick.id));
                 this.removed.set(brick.id, true);
             }
         }
 
         for (const gem of state.gems) {
-            if (!this.gemMap.has(gem.id)) {
+            if (!this.existing.has(gem.id)) {
                 this.addGem(gem, state);
             } else {
-                const g = this.gemMap.get(gem.id);
+                const g = this.existing.get(gem.id);
                 g.position.y = state.height - gem.y;
                 g.rotateX(MathUtils.degToRad(this.rotX));
                 g.rotateY(MathUtils.degToRad(this.rotY));
@@ -215,11 +221,26 @@ class ThreeRenderer {
 
             if ((gem.out || gem.used) && !this.removed.has(gem.id)) {
                 console.log('remove gem!');
-                this.group.remove(this.gemMap.get(gem.id));
+                this.group.remove(this.existing.get(gem.id));
                 this.removed.set(gem.id, gem);
             }
         }
 
+        for (const shoot of state.shoots) {
+            if (!this.existing.has(shoot.id)) {
+                this.addShoot(shoot, state);
+            } else {
+                const g = this.existing.get(shoot.id);
+                g.position.y = state.height - shoot.y;
+            }
+
+            if (shoot.used && !this.removed.has(shoot.id)) {
+                this.group.remove(this.existing.get(shoot.id));
+                this.removed.set(shoot.id, shoot);
+            }
+        }
+
+        this.paddle.scale.x = state.paddle.width / 200;
         this.paddle.position.x = state.paddle.x + state.paddle.width / 2;
         this.paddle.position.y = state.height - state.paddle.y;
         this.ball.position.y = state.height - state.ball.y;

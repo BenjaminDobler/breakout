@@ -82,11 +82,13 @@ export function render(canvas, brickColors, d) {
     }
 
     for (let shoot of d.shoots) {
-        context.fillStyle = 'red';
-        context.beginPath();
-        context.arc(shoot.x, shoot.y, 4, 0, Math.PI * 2);
-        context.fill();
-        context.closePath();
+        if (!shoot.used) {
+            context.fillStyle = 'red';
+            context.beginPath();
+            context.arc(shoot.x, shoot.y, 4, 0, Math.PI * 2);
+            context.fill();
+            context.closePath();
+        }
     }
 
     d.particles.draw();

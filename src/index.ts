@@ -66,8 +66,8 @@ const data = {
     particles: null
 };
 
-data.levelData[0] = createGridFromData(width, height, gridData2);
-data.levelData[1] = createGridFromData(width, height, gridData);
+data.levelData[0] = createGridFromData(width, height, gridData);
+data.levelData[1] = createGridFromData(width, height, gridData2);
 
 data.bricks = data.levelData[0];
 

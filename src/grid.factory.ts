@@ -1,3 +1,4 @@
+import { GemType } from './types';
 import { getId } from './util';
 
 export const gridData2 = {
@@ -212,115 +213,115 @@ export const gridData = {
                 {
                     r: 2,
                     c: 0,
-                    gemType: 4,
+                    gemType: GemType.MUNITION,
                     strength: 1
                 },
                 {
                     r: 2,
                     c: 19,
-                    gemType: 4,
+                    gemType: GemType.MUNITION,
                     strength: 1
                 },
                 {
                     r: 3,
                     c: 1,
-                    gemType: 5,
+                    gemType: GemType.MUNITION,
                     strength: 1
                 },
                 {
                     r: 3,
                     c: 18,
-                    gemType: 5,
+                    gemType: GemType.MUNITION,
                     strength: 1
                 },
                 {
                     r: 4,
                     c: 2,
-                    gemType: 4,
+                    gemType: GemType.MUNITION,
                     strength: 1
                 },
                 {
                     r: 4,
                     c: 9,
-                    gemType: 4,
+                    gemType: GemType.MUNITION,
                     strength: 1
                 },
                 {
                     r: 4,
                     c: 10,
-                    gemType: 4,
+                    gemType: GemType.MUNITION,
                     strength: 1
                 },
                 {
                     r: 4,
                     c: 17,
-                    gemType: 4,
+                    gemType: GemType.MUNITION,
                     strength: 1
                 },
                 {
                     r: 5,
                     c: 3,
-                    gemType: 4,
+                    gemType: GemType.MUNITION,
                     strength: 1
                 },
                 {
                     r: 5,
                     c: 16,
-                    gemType: 4,
+                    gemType: GemType.MUNITION,
                     strength: 1
                 },
                 {
                     r: 6,
                     c: 4,
-                    gemType: 3,
+                    gemType: GemType.MUNITION,
                     strength: 1
                 },
                 {
                     r: 6,
                     c: 15,
-                    gemType: 3,
+                    gemType: GemType.MUNITION,
                     strength: 1
                 },
                 {
                     r: 11,
                     c: 0,
-                    gemType: 4,
+                    gemType: GemType.MUNITION,
                     strength: 1
                 },
                 {
                     r: 11,
                     c: 1,
-                    gemType: 4,
+                    gemType: GemType.MUNITION,
                     strength: 1
                 },
                 {
                     r: 11,
                     c: 2,
-                    gemType: 4,
+                    gemType: GemType.MUNITION,
                     strength: 1
                 },
                 {
                     r: 11,
                     c: 3,
-                    gemType: 4,
+                    gemType: GemType.MUNITION,
                     strength: 1
                 },
                 {
                     r: 11,
                     c: 4,
-                    gemType: 4,
+                    gemType: GemType.MUNITION,
                     strength: 1
                 },
                 {
                     r: 11,
                     c: 5,
-                    gemType: 4,
+                    gemType: GemType.MUNITION,
                     strength: 1
                 },
                 {
                     r: 11,
                     c: 6,
-                    gemType: 4,
+                    gemType: GemType.MUNITION,
                     strength: 1
                 },
                 {
