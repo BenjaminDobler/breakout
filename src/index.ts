@@ -16,12 +16,11 @@ import { GemType, brickColors } from './types';
 
 console.log('init');
 
-const render = webglrenderer; //canvasRenderer;// webglrenderer; //canvasRenderer; //webglrenderer;
+const render = canvasRenderer;//webglrenderer; //canvasRenderer;// webglrenderer; //canvasRenderer; //webglrenderer;
 
-const height = 600;
-const width = 800;
+const height = 700;
+const width = 1000;
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-// const context = canvas.getContext('2d')
 
 const data = {
     lives: 4,
@@ -67,8 +66,8 @@ const data = {
     particles: null
 };
 
-data.levelData[0] = createGridFromData(width, height, gridData);
-data.levelData[1] = createGridFromData(width, height, gridData2);
+data.levelData[0] = createGridFromData(width, height, gridData2);
+data.levelData[1] = createGridFromData(width, height, gridData);
 
 data.bricks = data.levelData[0];
 
