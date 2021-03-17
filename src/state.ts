@@ -45,7 +45,7 @@ export function calculateState(acc, [[tick, pos], shoot]) {
         })
         acc.paddle.x = pos;
         acc.ball.x = acc.paddle.x + acc.paddle.width / 2;
-        acc.ball.y = acc.paddle.y - 30;
+        acc.ball.y = acc.paddle.y - 15;
         if (shoot) {
             acc.state = 'RUNNING';
         }

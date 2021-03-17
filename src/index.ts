@@ -33,14 +33,14 @@ const data = {
     shoots: [],
     ball: {
         x: width / 2,
-        y: height / 2,
+        y: height - 45,
         directionX: 0,
         directionY: 1,
         speed: 2.5,
         radius: 6
     },
     paddle: {
-        x: width / 2,
+        x: width / 2 - 100,
         y: height - 30,
         width: 200,
         height: 15,
