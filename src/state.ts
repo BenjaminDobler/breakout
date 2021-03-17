@@ -35,6 +35,14 @@ export function calculateState(acc, [[tick, pos], shoot]) {
         acc.state === 'START' ||
         acc.state === 'GAME_OVER'
     ) {
+        acc.shoots.forEach((shoot)=> {
+            shoot.used = true;
+        })
+
+        acc.gems.forEach((gem)=> {
+            gem.out = true;
+            gem.used = true;
+        })
         acc.paddle.x = pos;
         acc.ball.x = acc.paddle.x + acc.paddle.width / 2;
         acc.ball.y = acc.paddle.y - 30;

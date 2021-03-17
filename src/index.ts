@@ -36,7 +36,7 @@ const data = {
         y: height / 2,
         directionX: 0,
         directionY: 1,
-        speed: 2,
+        speed: 2.5,
         radius: 6
     },
     paddle: {
@@ -132,10 +132,12 @@ state$.subscribe(() => {
     render(canvas, brickColors, data);
 });
 
-const img = new Image();
-img.src = require('./assets/pattern3.jpeg');
-//ar bgPattern
-img.onload = () => {
-    // bgPattern = context.createPattern(img, 'repeat') // Create a pattern with this image, and set it to "repeat".
-    render(canvas, brickColors, data);
-};
+// const img = new Image();
+// img.src = require('./assets/pattern3.jpeg');
+// //ar bgPattern
+// img.onload = () => {
+//     // bgPattern = context.createPattern(img, 'repeat') // Create a pattern with this image, and set it to "repeat".
+// };
+render(canvas, brickColors, data);
+render(canvas, brickColors, data);
+
