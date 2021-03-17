@@ -4,6 +4,7 @@ import {
     BoxGeometry,
     DoubleSide,
     EdgesGeometry,
+    ExtrudeBufferGeometry,
     Group,
     IcosahedronGeometry,
     LineBasicMaterial,
@@ -16,6 +17,7 @@ import {
     PlaneBufferGeometry,
     PointLight,
     Scene,
+    Shape,
     SphereGeometry,
     SpotLight,
     WebGLRenderer
@@ -24,6 +26,36 @@ import { OrbitControls } from 'three-orbitcontrols-ts';
 import { Wall } from './objects/wall';
 
 import { brickColors } from './types';
+
+function createBoxWithRoundedEdges(width, height, depth, radius0, smoothness) {
+    let shape = new Shape();
+    let eps = 0.00001;
+    let radius = radius0 - eps;
+    shape.absarc(eps, eps, eps, -Math.PI / 2, -Math.PI, true);
+    shape.absarc(eps, height - radius * 2, eps, Math.PI, Math.PI / 2, true);
+    shape.absarc(
+        width - radius * 2,
+        height - radius * 2,
+        eps,
+        Math.PI / 2,
+        0,
+        true
+    );
+    shape.absarc(width - radius * 2, eps, eps, 0, -Math.PI / 2, true);
+    let geometry = new ExtrudeBufferGeometry(shape, {
+        depth: depth - radius0 * 2,
+        bevelEnabled: true,
+        bevelSegments: smoothness * 2,
+        steps: 1,
+        bevelSize: radius,
+        bevelThickness: radius0,
+        curveSegments: smoothness
+    });
+
+    geometry.center();
+
+    return geometry;
+}
 
 function addEdges(b, color = 0xdedede) {
     var edgegeo = new EdgesGeometry(b.geometry);
@@ -81,6 +113,15 @@ class ThreeRenderer {
         this.group.add(this.paddle);
 
         for (const brick of state.bricks) {
+            var roundedBoxGeometry = createBoxWithRoundedEdges(
+                brick.width,
+                brick.height,
+                30,
+                4,
+                3
+            );
+            roundedBoxGeometry.computeVertexNormals();
+            roundedBoxGeometry.translate(0, 0.5, 0);
             const brickGeometry: BoxBufferGeometry = new BoxBufferGeometry(
                 brick.width,
                 brick.height,
@@ -90,11 +131,11 @@ class ThreeRenderer {
                 color: brickColors[brick.gemType]
             });
 
-            const b = new Mesh(brickGeometry, brickMaterial);
+            const b = new Mesh(roundedBoxGeometry, brickMaterial);
 
             b.position.x = brick.x + brick.width / 2;
             b.position.y = state.height - (brick.y + brick.height / 2);
-            addEdges(b, brickColors[brick.gemType]);
+            //addEdges(b, brickColors[brick.gemType]);
             this.group.add(b);
             this.existing.set(brick.id, b);
             this.bricks.push(b);
