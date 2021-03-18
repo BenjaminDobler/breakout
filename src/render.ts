@@ -25,8 +25,8 @@ export function render(canvas, brickColors, d) {
     if (d.shooting.munition > 0) {
         context.beginPath();
         context.rect(
-            d.paddle.x - 20,
-            context.canvas.height - d.paddle.height - 10,
+            d.paddle.x + d.paddle.width/2 - 20,
+            d.paddle.y - d.paddle.height - 10,
             40,
             10
         );

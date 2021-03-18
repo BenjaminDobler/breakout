@@ -143,7 +143,7 @@ class ThreeRenderer {
 
         var geo = new PlaneBufferGeometry(width, height, 8, 8);
         var mat = new MeshBasicMaterial({
-            color: 0x20639b,
+            color: 0x515151,
             side: DoubleSide
         });
         var plane = new Mesh(geo, mat);
@@ -187,13 +187,13 @@ class ThreeRenderer {
 
         const light = new SpotLight(0xffffff);
         this.scene.add(light);
-        light.position.set(state.width / 2, state.height / 2, 400);
+        light.position.set(state.width/2, state.height / 2, 600);
         light.castShadow = false;
         light.shadow.mapSize.width = 1024;
         light.shadow.mapSize.height = 1024;
         light.shadow.camera.near = 1;
         light.shadow.camera.far = 2000;
-        light.shadow.camera.fov = 20;
+        light.shadow.camera.fov = 40;
 
         this.camera.position.set(0, 0, 500.0);
         this.camera.lookAt(0, 0, 0.0);
@@ -294,11 +294,15 @@ const r = new ThreeRenderer();
 
 let isInited = false;
 
+export function reinit() {
+    isInited = false;
+}
+
 export function render(canvas, brickColors, d) {
     if (!isInited) {
         r.init(canvas, d.width, d.height, d);
         isInited = true;
-        //r.render(d)
+        r.render(d)
     } else {
         r.render(d);
     }

@@ -35,14 +35,14 @@ export function calculateState(acc, [[tick, pos], shoot]) {
         acc.state === 'START' ||
         acc.state === 'GAME_OVER'
     ) {
-        acc.shoots.forEach((shoot)=> {
+        acc.shoots.forEach((shoot) => {
             shoot.used = true;
-        })
+        });
 
-        acc.gems.forEach((gem)=> {
+        acc.gems.forEach((gem) => {
             gem.out = true;
             gem.used = true;
-        })
+        });
         acc.paddle.x = pos;
         acc.ball.x = acc.paddle.x + acc.paddle.width / 2;
         acc.ball.y = acc.paddle.y - 15;
@@ -167,20 +167,22 @@ export function calculateState(acc, [[tick, pos], shoot]) {
 
         const activeBricks = acc.bricks.filter((b) => !b.hit);
         for (let shoot of acc.shoots) {
-            for (let brick of activeBricks) {
-                if (
-                    shoot.x > brick.x &&
-                    shoot.x < brick.x + brick.width &&
-                    shoot.y > brick.y &&
-                    shoot.y < brick.y + brick.height
-                ) {
-                    brick.hit = true;
+            if (!shoot.used) {
+                for (let brick of activeBricks) {
+                    if (
+                        shoot.x > brick.x &&
+                        shoot.x < brick.x + brick.width &&
+                        shoot.y > brick.y &&
+                        shoot.y < brick.y + brick.height
+                    ) {
+                        brick.hit = true;
+                        shoot.used = true;
+                    }
+                }
+                shoot.y -= 5;
+                if (shoot.y < 0) {
                     shoot.used = true;
                 }
-            }
-            shoot.y -= 5;
-            if (shoot.y < 0) {
-                shoot.used = true;
             }
         }
 

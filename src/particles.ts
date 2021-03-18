@@ -88,6 +88,7 @@ export class Particles {
                 // If 0, remove
                 if (particle.size < 0) {
                     particles.splice(ii, 1);
+                    console.log('remove particle');
                     // return;
                     continue;
                 }
@@ -105,6 +106,6 @@ export class Particles {
     }
 
     addExplosion(x, y) {
-        this.explosions.push(new Explosion(x, y));
+        this.explosions.push(new Explosion(x, y, 10));
     }
 }

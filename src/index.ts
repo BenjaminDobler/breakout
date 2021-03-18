@@ -11,16 +11,54 @@ import { createGridFromData, gridData, gridData2 } from './grid.factory';
 import { Particles } from './particles';
 import { render as canvasRenderer } from './render';
 import { calculateState } from './state';
-import { render as webglrenderer } from './three.renderer';
+import { reinit, render as webglrenderer } from './three.renderer';
 import { GemType, brickColors } from './types';
 
 console.log('init');
-
-const render = webglrenderer; //canvasRenderer;// webglrenderer; //canvasRenderer; //webglrenderer;
-
 const height = 700;
-const width = 1000;
-const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+const width = 1360;
+
+const container = document.getElementById('container');
+
+let canvas;
+
+function newCanvas() {
+    if (canvas) {
+        container.removeChild(canvas);
+    }
+    canvas = document.createElement('canvas') as HTMLCanvasElement;
+    canvas.setAttribute('width', width + '');
+    canvas.setAttribute('height', height + '');
+    container.appendChild(canvas);
+}
+
+newCanvas();
+
+const rendererCB = document.getElementById('renderer') as HTMLInputElement;
+rendererCB.addEventListener('change', () => {
+    if (rendererCB.checked) {
+        reinit();
+        newCanvas();
+        style = 'webgl';
+    } else {
+        newCanvas();
+
+        style = 'canvas';
+    }
+    render(canvas, brickColors, data);
+});
+
+let style = 'canvas';
+
+function render(canvas, brickColors, d) {
+    if (style === 'canvas') {
+        canvasRenderer(canvas, brickColors, d);
+    } else {
+        webglrenderer(canvas, brickColors, d);
+    }
+}
+
+// const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 
 const data = {
     lives: 4,
@@ -140,4 +178,3 @@ state$.subscribe(() => {
 // };
 render(canvas, brickColors, data);
 render(canvas, brickColors, data);
-
