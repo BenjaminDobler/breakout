@@ -1,5 +1,16 @@
 import { Particles } from './particles';
 
+
+function drawBall(context, ball) {
+    context.beginPath();
+    context.shadowColor = 'red';
+    context.fillStyle = '#ff0000';
+    context.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+    context.fill();
+    context.closePath();
+    context.shadowBlur = 0;
+}
+
 export function render(canvas, brickColors, d) {
     const context = canvas.getContext('2d');
 
@@ -34,15 +45,12 @@ export function render(canvas, brickColors, d) {
         context.closePath();
     }
 
-    // draw ball
-    context.beginPath();
-    context.shadowColor = 'red';
-    //context.shadowBlur = 15;
-    context.fillStyle = '#ff0000';
-    context.arc(d.ball.x, d.ball.y, d.ball.radius, 0, Math.PI * 2);
-    context.fill();
-    context.closePath();
-    context.shadowBlur = 0;
+
+    for(const ball of d.balls) {
+        if (!ball.out) {
+            drawBall(context, ball);
+        }
+    }
 
     context.fillStyle = '#dedede';
 

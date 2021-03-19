@@ -7,12 +7,13 @@ import {
     share,
     withLatestFrom
 } from 'rxjs/operators';
-import { createGridFromData, gridData, gridData2 } from './grid.factory';
+import { createGridFromData, gridData, gridData2, gridData3 } from './grid.factory';
 import { Particles } from './particles';
 import { render as canvasRenderer } from './render';
 import { calculateState } from './state';
 import { reinit, render as webglrenderer } from './three.renderer';
 import { GemType, brickColors } from './types';
+import { getId } from './util';
 
 console.log('init');
 const height = 700;
@@ -69,14 +70,15 @@ const data = {
     score: 0,
     lastShoot: Date.now(),
     shoots: [],
-    ball: {
+    balls:[ {
         x: width / 2,
         y: height - 45,
         directionX: 0,
         directionY: 1,
         speed: 2.5,
-        radius: 6
-    },
+        radius: 6,
+        id: getId()
+    }],
     paddle: {
         x: width / 2 - 100,
         y: height - 30,
@@ -104,7 +106,7 @@ const data = {
     particles: null
 };
 
-data.levelData[0] = createGridFromData(width, height, gridData);
+data.levelData[0] = createGridFromData(width, height, gridData3);
 data.levelData[1] = createGridFromData(width, height, gridData2);
 
 data.bricks = data.levelData[0];

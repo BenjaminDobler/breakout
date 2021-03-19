@@ -20,6 +20,49 @@ function intersects(rect1, rect2) {
     else return false;
 }
 
+function handleBall(state, ball) {
+    if (ball.y > state.height) {
+        // state.balls = state.balls.filter((b) => b !== ball);
+        ball.out = true;
+    } else {
+        if (ball.y < 0) {
+            ball.directionY *= -1;
+        }
+
+        ball.x += ball.speed * ball.directionX;
+        ball.y += ball.speed * ball.directionY;
+
+        if (
+            ball.x >= state.paddle.x &&
+            ball.x <= state.paddle.x + state.paddle.width &&
+            ball.y >= state.paddle.y - state.paddle.height - ball.radius / 2
+        ) {
+            let collidePoint = ball.x - state.paddle.x;
+            collidePoint = collidePoint - state.paddle.width / 2;
+            collidePoint = collidePoint / (state.paddle.width / 2);
+            const angle = (collidePoint * Math.PI) / 3;
+            ball.directionX = ball.speed * Math.sin(angle);
+            ball.directionY = -ball.speed * Math.cos(angle);
+        }
+
+        if (ball.x > state.width || ball.x < 0) {
+            ball.directionX *= -1;
+        }
+    }
+}
+
+function newInitialBall(state) {
+    state.balls.push({
+        x: state.paddle.x + state.paddle.width / 2,
+        y: state.height - 45,
+        directionX: 0,
+        directionY: 1,
+        speed: 2.5,
+        radius: 6,
+        id: getId()
+    });
+}
+
 export function calculateState(acc, [[tick, pos], shoot]) {
     if (acc.state === 'LEVEL_DONE') {
         console.log('level done ');
@@ -44,8 +87,11 @@ export function calculateState(acc, [[tick, pos], shoot]) {
             gem.used = true;
         });
         acc.paddle.x = pos;
-        acc.ball.x = acc.paddle.x + acc.paddle.width / 2;
-        acc.ball.y = acc.paddle.y - 15;
+
+        for (const ball of acc.balls) {
+            ball.x = acc.paddle.x + acc.paddle.width / 2;
+            ball.y = acc.paddle.y - 15;
+        }
         if (shoot) {
             acc.state = 'RUNNING';
         }
@@ -65,65 +111,44 @@ export function calculateState(acc, [[tick, pos], shoot]) {
             acc.shooting.munition -= 1;
         }
 
-        if (acc.ball.y > acc.height) {
-            // acc.ball.directionY *= -1;
+        if (acc.balls.length === 0) {
             acc.lives--;
-
             if (acc.lives > 0) {
-                acc.ball.x = acc.paddle.x;
-                acc.ball.y = acc.paddle.y;
+                newInitialBall(acc);
                 acc.state = 'AFTER_LIVE_LOST';
             } else {
-                acc.ball.x = acc.paddle.x;
-                acc.ball.y = acc.paddle.y;
+                newInitialBall(acc);
                 acc.state = 'GAME_OVER';
             }
         }
 
-        if (acc.ball.y < 0) {
-            acc.ball.directionY *= -1;
-        }
-
-        acc.ball.x += acc.ball.speed * acc.ball.directionX;
-        acc.ball.y += acc.ball.speed * acc.ball.directionY;
-
-        if (
-            acc.ball.x >= acc.paddle.x &&
-            acc.ball.x <= acc.paddle.x + acc.paddle.width &&
-            acc.ball.y >= acc.paddle.y - acc.paddle.height - acc.ball.radius / 2
-        ) {
-            let collidePoint = acc.ball.x - acc.paddle.x;
-            collidePoint = collidePoint - acc.paddle.width / 2;
-            collidePoint = collidePoint / (acc.paddle.width / 2);
-            const angle = (collidePoint * Math.PI) / 3;
-            acc.ball.directionX = acc.ball.speed * Math.sin(angle);
-            acc.ball.directionY = -acc.ball.speed * Math.cos(angle);
-        }
-
-        if (acc.ball.x > acc.width || acc.ball.x < 0) {
-            acc.ball.directionX *= -1;
+        for (const ball of acc.balls) {
+            handleBall(acc, ball);
         }
 
         for (let brick of acc.bricks.filter((b) => !b.hit)) {
-            const collide = collision(brick, acc.ball);
-            if (collide) {
-                brick.hit = true;
-                acc.ball.directionY *= -1;
-                if (acc.particles) {
-                    acc.particles.addExplosion(acc.ball.x, acc.ball.y);
-                }
-                acc.score += 100;
-                if (brick.gemType !== GemType.NONE) {
-                    acc.gems.push({
-                        x: brick.x,
-                        y: brick.y,
-                        width: brick.width,
-                        height: brick.height,
-                        color: brick.color,
-                        out: false,
-                        type: brick.gemType,
-                        id: getId()
-                    });
+            for (let ball of acc.balls) {
+                console.log('ball ', ball);
+                const collide = collision(brick, ball);
+                if (collide) {
+                    brick.hit = true;
+                    ball.directionY *= -1;
+                    if (acc.particles) {
+                        acc.particles.addExplosion(ball.x, ball.y);
+                    }
+                    acc.score += 100;
+                    if (brick.gemType !== GemType.NONE) {
+                        acc.gems.push({
+                            x: brick.x,
+                            y: brick.y,
+                            width: brick.width,
+                            height: brick.height,
+                            color: brick.color,
+                            out: false,
+                            type: brick.gemType,
+                            id: getId()
+                        });
+                    }
                 }
             }
         }
@@ -135,10 +160,10 @@ export function calculateState(acc, [[tick, pos], shoot]) {
             if (gem.y > acc.height) {
                 gem.out = true;
             }
-            const collideWithBall = collision(gem, acc.ball);
-            if (collideWithBall) {
-                console.log('gem collide with ball');
-            }
+            // const collideWithBall = collision(gem, acc.ball);
+            // if (collideWithBall) {
+            //     console.log('gem collide with ball');
+            // }
 
             const collideWithPaddle = intersects(gem, {
                 x: acc.paddle.x,
@@ -156,11 +181,20 @@ export function calculateState(acc, [[tick, pos], shoot]) {
                 } else if (gem.type === GemType.PADDLE_SHRINK) {
                     acc.paddle.targetWidth = acc.paddle.targetWidth - 20;
                 } else if (gem.type === GemType.BALL_SPEED_INCREASE) {
-                    acc.ball.speed *= 1.2;
+                    acc.balls.forEach((ball) => (ball.speed *= 1.2));
                 } else if (gem.type === GemType.BALL_SPEED_DECREASE) {
-                    acc.ball.speed *= 0.8;
+                    acc.balls.forEach((ball) => (ball.speed *= 0.8));
                 } else if (gem.type === GemType.MUNITION) {
                     acc.shooting.munition += 10;
+                } else if (gem.type === GemType.EXTRA_BALL) {
+                    acc.balls.push({
+                        x: acc.paddle.x + acc.paddle.width / 2,
+                        y: acc.paddle.y - 15,
+                        directionX: 0,
+                        directionY: 1,
+                        speed: 2.5,
+                        radius: 6
+                    });
                 }
             }
         }

@@ -70,7 +70,6 @@ class ThreeRenderer {
     camera: PerspectiveCamera;
     renderer: WebGLRenderer;
     paddle: Mesh;
-    ball: Mesh;
     bricks: Mesh[] = [];
 
     existing: Map<any, any> = new Map<any, any>();
@@ -88,14 +87,6 @@ class ThreeRenderer {
         this.renderer = new WebGLRenderer({ canvas: canvas, antialias: true });
         this.renderer.setSize(width, height);
         // document.body.appendChild(renderer.domElement)
-
-        const ballGeometry: SphereGeometry = new SphereGeometry(10, 20, 20);
-        const ballMaterial: MeshLambertMaterial = new MeshLambertMaterial({
-            color: 0x0000ff
-        });
-
-        this.ball = new Mesh(ballGeometry, ballMaterial);
-        this.group.add(this.ball);
 
         const geometry: BoxBufferGeometry = new BoxBufferGeometry(
             state.paddle.width,
@@ -187,7 +178,7 @@ class ThreeRenderer {
 
         const light = new SpotLight(0xffffff);
         this.scene.add(light);
-        light.position.set(state.width/2, state.height / 2, 600);
+        light.position.set(state.width / 2, state.height / 2, 600);
         light.castShadow = false;
         light.shadow.mapSize.width = 1024;
         light.shadow.mapSize.height = 1024;
@@ -205,6 +196,17 @@ class ThreeRenderer {
         this.group.position.y = -state.height / 2;
 
         //this.scene.rotateX(40);
+    }
+
+    addBall(ball) {
+        const ballGeometry: SphereGeometry = new SphereGeometry(10, 20, 20);
+        const ballMaterial: MeshLambertMaterial = new MeshLambertMaterial({
+            color: 0x0000ff
+        });
+
+        const ballMesh = new Mesh(ballGeometry, ballMaterial);
+        this.existing.set(ball.id, ballMesh);
+        this.group.add(ballMesh);
     }
 
     addGem(gem, state) {
@@ -281,11 +283,26 @@ class ThreeRenderer {
             }
         }
 
+
+        for (const ball of state.balls) {
+            if (!this.existing.has(ball.id)) {
+                this.addBall(ball);
+            } else {
+                const ballMesh = this.existing.get(ball.id);
+                ballMesh.position.y = state.height - ball.y;
+                ballMesh.position.x = ball.x + ball.radius;
+            }
+
+            if (ball.out && !this.removed.has(ball.id)) {
+                this.group.remove(this.existing.get(ball.id));
+                this.removed.set(ball.id, ball);
+            }
+        }
+
         this.paddle.scale.x = state.paddle.width / 200;
         this.paddle.position.x = state.paddle.x + state.paddle.width / 2;
         this.paddle.position.y = state.height - state.paddle.y;
-        this.ball.position.y = state.height - state.ball.y;
-        this.ball.position.x = state.ball.x + state.ball.radius;
+
         this.renderer.render(this.scene, this.camera);
     }
 }
@@ -302,7 +319,7 @@ export function render(canvas, brickColors, d) {
     if (!isInited) {
         r.init(canvas, d.width, d.height, d);
         isInited = true;
-        r.render(d)
+        r.render(d);
     } else {
         r.render(d);
     }

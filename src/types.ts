@@ -4,7 +4,8 @@ export enum GemType {
     PADDLE_GROW = 2,
     PADDLE_SHRINK = 3,
     NONE = 4,
-    MUNITION = 5
+    MUNITION = 5,
+    EXTRA_BALL = 6
 }
 
 export interface Rect {
@@ -28,3 +29,5 @@ brickColors[GemType.BALL_SPEED_INCREASE] = 'green';
 brickColors[GemType.PADDLE_GROW] = 'black';
 brickColors[GemType.PADDLE_SHRINK] = 'yellow';
 brickColors[GemType.MUNITION] = 'pink';
+brickColors[GemType.EXTRA_BALL] = 'green';
+

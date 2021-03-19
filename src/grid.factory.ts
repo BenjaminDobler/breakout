@@ -1,6 +1,412 @@
 import { GemType } from './types';
 import { getId } from './util';
 
+export const gridData3 = {
+    grids: [
+        {
+            rows: 40,
+            cols: 10,
+            bricks: [
+                {
+                    r: 4,
+                    c: 1,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 4,
+                    c: 2,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 4,
+                    c: 3,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 4,
+                    c: 4,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 4,
+                    c: 5,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 4,
+                    c: 6,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 4,
+                    c: 7,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 4,
+                    c: 8,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 15,
+                    c: 2,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 16,
+                    c: 1,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 16,
+                    c: 8,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 17,
+                    c: 1,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 17,
+                    c: 8,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 18,
+                    c: 1,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 18,
+                    c: 8,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 19,
+                    c: 1,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 19,
+                    c: 8,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 20,
+                    c: 1,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 20,
+                    c: 4,
+                    gemType: 6,
+                    strength: 1
+                },
+                {
+                    r: 20,
+                    c: 5,
+                    gemType: 6,
+                    strength: 1
+                },
+                {
+                    r: 20,
+                    c: 8,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 21,
+                    c: 0,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 21,
+                    c: 1,
+                    gemType: 2,
+                    strength: 1
+                },
+                {
+                    r: 21,
+                    c: 2,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 21,
+                    c: 3,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 21,
+                    c: 4,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 21,
+                    c: 5,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 21,
+                    c: 6,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 21,
+                    c: 7,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 21,
+                    c: 8,
+                    gemType: 2,
+                    strength: 1
+                },
+                {
+                    r: 21,
+                    c: 9,
+                    gemType: 4,
+                    strength: 1
+                }
+            ]
+        },
+        {
+            rows: 20,
+            cols: 20,
+            bricks: [
+                {
+                    r: 4,
+                    c: 3,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 4,
+                    c: 4,
+                    gemType: 1,
+                    strength: 1
+                },
+                {
+                    r: 4,
+                    c: 5,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 4,
+                    c: 6,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 4,
+                    c: 7,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 4,
+                    c: 8,
+                    gemType: 3,
+                    strength: 1
+                },
+                {
+                    r: 4,
+                    c: 9,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 4,
+                    c: 10,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 4,
+                    c: 11,
+                    gemType: 3,
+                    strength: 1
+                },
+                {
+                    r: 4,
+                    c: 12,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 4,
+                    c: 13,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 4,
+                    c: 14,
+                    gemType: 1,
+                    strength: 1
+                },
+                {
+                    r: 4,
+                    c: 15,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 4,
+                    c: 16,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 7,
+                    c: 0,
+                    gemType: 5,
+                    strength: 1
+                },
+                {
+                    r: 7,
+                    c: 1,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 7,
+                    c: 2,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 7,
+                    c: 3,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 7,
+                    c: 4,
+                    gemType: 6,
+                    strength: 1
+                },
+                {
+                    r: 7,
+                    c: 5,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 7,
+                    c: 6,
+                    gemType: 0,
+                    strength: 1
+                },
+                {
+                    r: 7,
+                    c: 7,
+                    gemType: 5,
+                    strength: 1
+                },
+                {
+                    r: 7,
+                    c: 8,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 7,
+                    c: 9,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 7,
+                    c: 10,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 7,
+                    c: 11,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 7,
+                    c: 12,
+                    gemType: 5,
+                    strength: 1
+                },
+                {
+                    r: 7,
+                    c: 13,
+                    gemType: 0,
+                    strength: 1
+                },
+                {
+                    r: 7,
+                    c: 14,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 7,
+                    c: 15,
+                    gemType: 6,
+                    strength: 1
+                },
+                {
+                    r: 7,
+                    c: 16,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 7,
+                    c: 17,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 7,
+                    c: 18,
+                    gemType: 4,
+                    strength: 1
+                },
+                {
+                    r: 7,
+                    c: 19,
+                    gemType: 5,
+                    strength: 1
+                }
+            ]
+        }
+    ]
+};
 export const gridData2 = {
     grids: [
         {
@@ -645,4 +1051,4 @@ export function createGrid(width, height, rows, colums) {
     return bricks;
 }
 
-export const levelData = [gridData, gridData2];
+export const levelData = [gridData3, gridData, gridData2];
