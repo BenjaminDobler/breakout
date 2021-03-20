@@ -5,9 +5,15 @@ import {
     map,
     scan,
     share,
+    startWith,
     withLatestFrom
 } from 'rxjs/operators';
-import { createGridFromData, gridData, gridData2, gridData3 } from './grid.factory';
+import {
+    createGridFromData,
+    gridData,
+    gridData2,
+    gridData3
+} from './grid.factory';
 import { Particles } from './particles';
 import { render as canvasRenderer } from './render';
 import { calculateState } from './state';
@@ -70,15 +76,17 @@ const data = {
     score: 0,
     lastShoot: Date.now(),
     shoots: [],
-    balls:[ {
-        x: width / 2,
-        y: height - 45,
-        directionX: 0,
-        directionY: 1,
-        speed: 2.5,
-        radius: 6,
-        id: getId()
-    }],
+    balls: [
+        {
+            x: width / 2,
+            y: height - 45,
+            directionX: 0,
+            directionY: 1,
+            speed: 2.5,
+            radius: 6,
+            id: getId()
+        }
+    ],
     paddle: {
         x: width / 2 - 100,
         y: height - 30,
@@ -147,11 +155,14 @@ const state$ = $tick.pipe(
 
 const scoreEl = document.getElementById('score');
 const munitionEl = document.getElementById('munition');
+const livesEl = document.getElementById('lives');
+const levelEl = document.getElementById('level');
 
 state$
     .pipe(
         map((data) => data.score),
-        distinctUntilChanged()
+        distinctUntilChanged(),
+        startWith(0)
     )
     .subscribe((m) => {
         console.log('Munitioon changed ', m);
@@ -160,8 +171,31 @@ state$
 
 state$
     .pipe(
+        map((data) => data.lives),
+        distinctUntilChanged(),
+        startWith(data.lives)
+    )
+    .subscribe((l) => {
+        console.log('Lives changed ', l);
+        livesEl.textContent = l + '';
+    });
+
+state$
+    .pipe(
+        map((data) => data.level),
+        distinctUntilChanged(),
+        startWith(0)
+    )
+    .subscribe((l) => {
+        console.log('Level changed ', l);
+        livesEl.textContent = l + '';
+    });
+
+state$
+    .pipe(
         map((data) => data.shooting.munition),
-        distinctUntilChanged()
+        distinctUntilChanged(),
+        startWith(0)
     )
     .subscribe((m) => {
         console.log('Munitioon changed ', m);

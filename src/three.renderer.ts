@@ -24,8 +24,12 @@ import {
 } from 'three';
 import { OrbitControls } from 'three-orbitcontrols-ts';
 import { Wall } from './objects/wall';
+import { GUI } from 'dat.gui'
 
 import { brickColors } from './types';
+
+
+const gui = new GUI();
 
 function createBoxWithRoundedEdges(width, height, depth, radius0, smoothness) {
     let shape = new Shape();
@@ -164,14 +168,18 @@ class ThreeRenderer {
         rightW.rotateZ(MathUtils.degToRad(90));
         this.group.add(rightW);
 
-        //this.scene.add(new AmbientLight(0xffffff, 0.5))
-        //this.scene.add(new PointLight(0xffffff, 0.1))
-
         const controls = new OrbitControls(
             this.camera,
             this.renderer.domElement
         );
         controls.enableZoom = true;
+
+        controls.dollyOut = function(){
+            this.camera.position.z -= 100;
+        }
+        controls.dollyIn = function(){
+            this.camera.position.z += 100;
+        }
 
         const amb = new AmbientLight(0x444444);
         this.scene.add(amb);
@@ -185,6 +193,13 @@ class ThreeRenderer {
         light.shadow.camera.near = 1;
         light.shadow.camera.far = 2000;
         light.shadow.camera.fov = 40;
+
+        const lightFolder = gui.addFolder('Light');
+        lightFolder.add(light.position, 'x', 0, 2000);
+        lightFolder.add(light.position, 'y', 0, 2000);
+        lightFolder.add(light.position, 'z', 0, 2000);
+
+
 
         this.camera.position.set(0, 0, 500.0);
         this.camera.lookAt(0, 0, 0.0);
@@ -204,9 +219,14 @@ class ThreeRenderer {
             color: 0x0000ff
         });
 
+
+
         const ballMesh = new Mesh(ballGeometry, ballMaterial);
-        this.existing.set(ball.id, ballMesh);
-        this.group.add(ballMesh);
+        const mesh = new PointLight(0xffffff, 1, 200);
+        mesh.add(ballMesh);
+
+        this.existing.set(ball.id, mesh);
+        this.group.add(mesh);
     }
 
     addGem(gem, state) {
@@ -252,6 +272,7 @@ class ThreeRenderer {
             }
         }
 
+        // Handle Gems
         for (const gem of state.gems) {
             if (!this.existing.has(gem.id)) {
                 this.addGem(gem, state);
@@ -269,6 +290,7 @@ class ThreeRenderer {
             }
         }
 
+        // Handle shoots
         for (const shoot of state.shoots) {
             if (!this.existing.has(shoot.id)) {
                 this.addShoot(shoot, state);
@@ -284,7 +306,13 @@ class ThreeRenderer {
         }
 
 
+        // Handle balls
         for (const ball of state.balls) {
+            if (ball.out && !this.removed.has(ball.id)) {
+                this.group.remove(this.existing.get(ball.id));
+                this.removed.set(ball.id, ball);
+            }
+
             if (!this.existing.has(ball.id)) {
                 this.addBall(ball);
             } else {
@@ -292,16 +320,13 @@ class ThreeRenderer {
                 ballMesh.position.y = state.height - ball.y;
                 ballMesh.position.x = ball.x + ball.radius;
             }
-
-            if (ball.out && !this.removed.has(ball.id)) {
-                this.group.remove(this.existing.get(ball.id));
-                this.removed.set(ball.id, ball);
-            }
         }
 
+        // Handle Paddle
         this.paddle.scale.x = state.paddle.width / 200;
         this.paddle.position.x = state.paddle.x + state.paddle.width / 2;
         this.paddle.position.y = state.height - state.paddle.y;
+
 
         this.renderer.render(this.scene, this.camera);
     }

@@ -64,6 +64,9 @@ function newInitialBall(state) {
 }
 
 export function calculateState(acc, [[tick, pos], shoot]) {
+
+    const activeBalls = acc.balls.filter(b => !b.out);
+
     if (acc.state === 'LEVEL_DONE') {
         console.log('level done ');
         if (shoot) {
@@ -111,11 +114,12 @@ export function calculateState(acc, [[tick, pos], shoot]) {
             acc.shooting.munition -= 1;
         }
 
-        if (acc.balls.length === 0) {
+        if (activeBalls.length === 0) {
             acc.lives--;
             if (acc.lives > 0) {
                 newInitialBall(acc);
                 acc.state = 'AFTER_LIVE_LOST';
+                
             } else {
                 newInitialBall(acc);
                 acc.state = 'GAME_OVER';
@@ -128,7 +132,6 @@ export function calculateState(acc, [[tick, pos], shoot]) {
 
         for (let brick of acc.bricks.filter((b) => !b.hit)) {
             for (let ball of acc.balls) {
-                console.log('ball ', ball);
                 const collide = collision(brick, ball);
                 if (collide) {
                     brick.hit = true;
