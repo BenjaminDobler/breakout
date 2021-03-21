@@ -3,12 +3,9 @@ import {
     BoxBufferGeometry,
     BoxGeometry,
     DoubleSide,
-    EdgesGeometry,
-    ExtrudeBufferGeometry,
     Group,
     IcosahedronGeometry,
-    LineBasicMaterial,
-    LineSegments,
+    ImageUtils,
     MathUtils,
     Mesh,
     MeshBasicMaterial,
@@ -16,58 +13,20 @@ import {
     PerspectiveCamera,
     PlaneBufferGeometry,
     PointLight,
+    RepeatWrapping,
     Scene,
-    Shape,
     SphereGeometry,
     SpotLight,
+    TextureLoader,
     WebGLRenderer
 } from 'three';
 import { OrbitControls } from 'three-orbitcontrols-ts';
 import { Wall } from './objects/wall';
-import { GUI } from 'dat.gui'
+import { GUI } from 'dat.gui';
+import { brickColors } from '../../types';
+import { createBoxWithRoundedEdges } from './utils';
 
-import { brickColors } from './types';
-
-
-const gui = new GUI();
-
-function createBoxWithRoundedEdges(width, height, depth, radius0, smoothness) {
-    let shape = new Shape();
-    let eps = 0.00001;
-    let radius = radius0 - eps;
-    shape.absarc(eps, eps, eps, -Math.PI / 2, -Math.PI, true);
-    shape.absarc(eps, height - radius * 2, eps, Math.PI, Math.PI / 2, true);
-    shape.absarc(
-        width - radius * 2,
-        height - radius * 2,
-        eps,
-        Math.PI / 2,
-        0,
-        true
-    );
-    shape.absarc(width - radius * 2, eps, eps, 0, -Math.PI / 2, true);
-    let geometry = new ExtrudeBufferGeometry(shape, {
-        depth: depth - radius0 * 2,
-        bevelEnabled: true,
-        bevelSegments: smoothness * 2,
-        steps: 1,
-        bevelSize: radius,
-        bevelThickness: radius0,
-        curveSegments: smoothness
-    });
-
-    geometry.center();
-
-    return geometry;
-}
-
-function addEdges(b, color = 0xdedede) {
-    var edgegeo = new EdgesGeometry(b.geometry);
-    var mat = new LineBasicMaterial({ color: color, linewidth: 4 });
-    var wireframe = new LineSegments(edgegeo, mat);
-    wireframe.renderOrder = 1; // make sure wireframes are rendered 2nd
-    b.add(wireframe);
-}
+const boardTextureImage = require('../../board3.png');
 
 class ThreeRenderer {
     scene: Scene;
@@ -80,17 +39,41 @@ class ThreeRenderer {
     removed: Map<any, any> = new Map<any, any>();
 
     group: Group;
+    gui;
+    state: any;
 
     init(canvas, width, height, state) {
         this.group = new Group();
 
         this.scene = new Scene();
 
+        if (this.gui) {
+            this.gui.destroy();
+        }
+        this.gui = new GUI();
+
+        const boardTexture = new TextureLoader().load(boardTextureImage, ()=>{
+            this.render(this.state);
+        });
+
+        boardTexture.wrapS = boardTexture.wrapT = RepeatWrapping;
+        boardTexture.repeat.set(5, 5); // Scale the board texture
+
+
+        // Camera
         this.camera = new PerspectiveCamera(80, width / height, 0.1, 2000);
+        this.camera.position.set(0, 0, 500.0);
+        this.camera.lookAt(0, 0, 0.0);
+
+        const cameraFolder = this.gui.addFolder('Camera');
+        cameraFolder.add(this.camera, 'fov', 0, 400);
+        cameraFolder.add(this.camera, 'far', 0, 3000);
+        cameraFolder.add(this.camera, 'near', 0.0, 5);
+        cameraFolder.add(this.camera.position, 'z', 0, 2000);
+        cameraFolder.add(this.camera.position, 'y', -1000, 2000);
 
         this.renderer = new WebGLRenderer({ canvas: canvas, antialias: true });
         this.renderer.setSize(width, height);
-        // document.body.appendChild(renderer.domElement)
 
         const geometry: BoxBufferGeometry = new BoxBufferGeometry(
             state.paddle.width,
@@ -104,7 +87,7 @@ class ThreeRenderer {
         });
 
         this.paddle = new Mesh(geometry, material);
-        addEdges(this.paddle);
+        // addEdges(this.paddle);
         this.group.add(this.paddle);
 
         for (const brick of state.bricks) {
@@ -138,13 +121,15 @@ class ThreeRenderer {
 
         var geo = new PlaneBufferGeometry(width, height, 8, 8);
         var mat = new MeshBasicMaterial({
-            color: 0x515151,
+            color: 0xffffff,
             side: DoubleSide
         });
         var plane = new Mesh(geo, mat);
         plane.position.z = -16;
         plane.position.x = state.width / 2;
         plane.position.y = state.height / 2;
+        plane.material.map = boardTexture;
+
         this.group.add(plane);
 
         const bottom = new Wall(state.width);
@@ -174,12 +159,12 @@ class ThreeRenderer {
         );
         controls.enableZoom = true;
 
-        controls.dollyOut = function(){
+        controls.dollyOut = function () {
             this.camera.position.z -= 100;
-        }
-        controls.dollyIn = function(){
+        };
+        controls.dollyIn = function () {
             this.camera.position.z += 100;
-        }
+        };
 
         const amb = new AmbientLight(0x444444);
         this.scene.add(amb);
@@ -194,15 +179,11 @@ class ThreeRenderer {
         light.shadow.camera.far = 2000;
         light.shadow.camera.fov = 40;
 
-        const lightFolder = gui.addFolder('Light');
+        const lightFolder = this.gui.addFolder('Light');
         lightFolder.add(light.position, 'x', 0, 2000);
         lightFolder.add(light.position, 'y', 0, 2000);
         lightFolder.add(light.position, 'z', 0, 2000);
 
-
-
-        this.camera.position.set(0, 0, 500.0);
-        this.camera.lookAt(0, 0, 0.0);
         controls.update();
 
         this.scene.add(this.group);
@@ -219,14 +200,16 @@ class ThreeRenderer {
             color: 0x0000ff
         });
 
-
-
         const ballMesh = new Mesh(ballGeometry, ballMaterial);
         const mesh = new PointLight(0xffffff, 1, 200);
+        mesh.position.x = ball.x;
+        mesh.position.z = 10;
+
         mesh.add(ballMesh);
 
         this.existing.set(ball.id, mesh);
         this.group.add(mesh);
+        return mesh;
     }
 
     addGem(gem, state) {
@@ -243,6 +226,7 @@ class ThreeRenderer {
         gem.rotX = 0;
         this.group.add(b);
         this.existing.set(gem.id, b);
+        return b;
     }
 
     addShoot(shoot, state) {
@@ -258,75 +242,70 @@ class ThreeRenderer {
         b.position.y = state.height - shoot.y;
         this.group.add(b);
         this.existing.set(shoot.id, b);
+        return b;
+    }
+
+    addItem(item, state, type) {
+        if (type === 'gem') {
+            return this.addGem(item, state);
+        } else if (type === 'ball') {
+            return this.addBall(item);
+        } else if (type === 'shoot') {
+            return this.addShoot(item, state);
+        }
+    }
+
+    addOrRemoveItem(items, state, type) {
+        const i = [];
+        for (const item of items) {
+            if (item.out && !this.removed.has(item.id)) {
+                this.group.remove(this.existing.get(item.id));
+                this.removed.set(item.id, item);
+            } else {
+                let existing = this.existing.get(item.id);
+                if (!existing) {
+                    existing = this.addItem(item, state, type);
+                    console.log('existing created ', existing);
+                }
+                i.push([item, existing]);
+            }
+        }
+        return i;
     }
 
     rotX = 0;
     rotY = 0;
     render(state) {
+        this.state = state;
         this.rotX += 0.5;
         // this.rotY+=.5;
-        for (const brick of state.bricks) {
-            if (brick.hit && !this.removed.has(brick.id)) {
-                this.group.remove(this.existing.get(brick.id));
-                this.removed.set(brick.id, true);
-            }
+
+        this.addOrRemoveItem(state.bricks, state, 'brick');
+        const gems = this.addOrRemoveItem(state.gems, state, 'gem');
+        const shoots = this.addOrRemoveItem(state.shoots, state, 'shoot');
+        const balls = this.addOrRemoveItem(state.balls, state, 'ball');
+
+        console.log(gems);
+
+        for (const [gem, mesh] of gems) {
+            mesh.position.y = state.height - gem.y;
+            mesh.rotateX(MathUtils.degToRad(this.rotX));
+            mesh.rotateY(MathUtils.degToRad(this.rotY));
         }
 
-        // Handle Gems
-        for (const gem of state.gems) {
-            if (!this.existing.has(gem.id)) {
-                this.addGem(gem, state);
-            } else {
-                const g = this.existing.get(gem.id);
-                g.position.y = state.height - gem.y;
-                g.rotateX(MathUtils.degToRad(this.rotX));
-                g.rotateY(MathUtils.degToRad(this.rotY));
-            }
-
-            if ((gem.out || gem.used) && !this.removed.has(gem.id)) {
-                console.log('remove gem!');
-                this.group.remove(this.existing.get(gem.id));
-                this.removed.set(gem.id, gem);
-            }
+        for (const [shoot, mesh] of shoots) {
+            mesh.position.y = state.height - shoot.y;
         }
 
-        // Handle shoots
-        for (const shoot of state.shoots) {
-            if (!this.existing.has(shoot.id)) {
-                this.addShoot(shoot, state);
-            } else {
-                const g = this.existing.get(shoot.id);
-                g.position.y = state.height - shoot.y;
-            }
-
-            if (shoot.used && !this.removed.has(shoot.id)) {
-                this.group.remove(this.existing.get(shoot.id));
-                this.removed.set(shoot.id, shoot);
-            }
-        }
-
-
-        // Handle balls
-        for (const ball of state.balls) {
-            if (ball.out && !this.removed.has(ball.id)) {
-                this.group.remove(this.existing.get(ball.id));
-                this.removed.set(ball.id, ball);
-            }
-
-            if (!this.existing.has(ball.id)) {
-                this.addBall(ball);
-            } else {
-                const ballMesh = this.existing.get(ball.id);
-                ballMesh.position.y = state.height - ball.y;
-                ballMesh.position.x = ball.x + ball.radius;
-            }
+        for (const [ball, mesh] of balls) {
+            mesh.position.y = state.height - ball.y;
+            mesh.position.x = ball.x + ball.radius;
         }
 
         // Handle Paddle
         this.paddle.scale.x = state.paddle.width / 200;
         this.paddle.position.x = state.paddle.x + state.paddle.width / 2;
         this.paddle.position.y = state.height - state.paddle.y;
-
 
         this.renderer.render(this.scene, this.camera);
     }

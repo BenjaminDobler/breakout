@@ -1,4 +1,4 @@
-import { animationFrameScheduler, fromEvent, interval, merge } from 'rxjs';
+import { animationFrameScheduler, fromEvent, interval, merge, of } from 'rxjs';
 import {
     distinctUntilChanged,
     filter,
@@ -6,6 +6,7 @@ import {
     scan,
     share,
     startWith,
+    tap,
     withLatestFrom
 } from 'rxjs/operators';
 import {
@@ -14,16 +15,25 @@ import {
     gridData2,
     gridData3
 } from './grid.factory';
-import { Particles } from './particles';
-import { render as canvasRenderer } from './render';
+import { Particles } from './renderer/2d/particles';
+import { render as canvasRenderer } from './renderer/2d/canvas.renderer';
 import { calculateState } from './state';
-import { reinit, render as webglrenderer } from './three.renderer';
+import {
+    reinit,
+    render as webglrenderer
+} from './renderer/3d/threejs.renderer';
 import { GemType, brickColors } from './types';
 import { getId } from './util';
+
+import Stats from 'stats.js';
 
 console.log('init');
 const height = 700;
 const width = 1360;
+
+const stats = new Stats();
+//this.stats. // 0: fps, 1: ms, 2: mb, 3+: custom
+document.body.appendChild(stats.dom);
 
 const container = document.getElementById('container');
 
@@ -58,14 +68,15 @@ rendererCB.addEventListener('change', () => {
 let style = 'canvas';
 
 function render(canvas, brickColors, d) {
+    stats.begin();
     if (style === 'canvas') {
         canvasRenderer(canvas, brickColors, d);
     } else {
         webglrenderer(canvas, brickColors, d);
     }
+    stats.end();
+    stats.update();
 }
-
-// const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 
 const data = {
     lives: 4,
@@ -127,23 +138,41 @@ const keyboardInput$ = merge(
     fromEvent(window, 'keyup').pipe(map(() => 0))
 );
 
-const $tick = interval(17, animationFrameScheduler);
+const $tick = interval(1000 / 60, animationFrameScheduler);
+
+// const keyboardPos$ = $tick.pipe(
+//     withLatestFrom(keyboardInput$),
+//     map(([, input]) => input),
+//     scan((acc, pos) => {
+//         return acc + pos * data.paddle.speed;
+//     }, width / 2),
+//     distinctUntilChanged()
+// );
+
 
 const keyboardPos$ = $tick.pipe(
-    withLatestFrom(keyboardInput$),
+    withLatestFrom(fromEvent(window, 'mousemove')),
     map(([, input]) => input),
-    scan((acc, pos) => {
-        return acc + pos * data.paddle.speed;
+    scan((acc, pos:any) => {
+        return pos.pageX;
     }, width / 2),
     distinctUntilChanged()
 );
 
+// const keyboardShoot$ = merge(
+//     fromEvent(window, 'keydown').pipe(
+//         filter((e: any) => e.keyCode === 38),
+//         map(() => true)
+//     ),
+//     fromEvent(window, 'keyup').pipe(map(() => false))
+// );
+
+
 const keyboardShoot$ = merge(
-    fromEvent(window, 'keydown').pipe(
-        filter((e: any) => e.keyCode === 38),
+    fromEvent(window, 'mousedown').pipe(
         map(() => true)
     ),
-    fromEvent(window, 'keyup').pipe(map(() => false))
+    fromEvent(window, 'mouseup').pipe(map(() => false))
 );
 
 const state$ = $tick.pipe(
@@ -203,6 +232,7 @@ state$
     });
 
 state$.subscribe(() => {
+    console.log('render');
     render(canvas, brickColors, data);
 });
 

@@ -26,9 +26,13 @@
     },
     "dependencies": {
         "@types/dat-gui": "^0.6.3",
+        "@types/stats": "^0.16.30",
+        "@types/stats.js": "^0.17.0",
         "@types/three": "^0.126.0",
         "dat.gui": "^0.7.7",
         "rxjs": "^6.6.6",
+        "stats": "^1.0.0",
+        "stats.js": "^0.17.0",
         "three": "^0.126.1",
         "three-orbitcontrols-ts": "^0.1.2"
     }

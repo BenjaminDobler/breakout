@@ -1,6 +1,5 @@
 import { Particles } from './particles';
 
-
 function drawBall(context, ball) {
     context.beginPath();
     context.shadowColor = 'red';
@@ -13,6 +12,10 @@ function drawBall(context, ball) {
 
 export function render(canvas, brickColors, d) {
     const context = canvas.getContext('2d');
+    const activeBalls = d.balls.filter((b) => !b.out);
+    const activeBricks = d.bricks.filter((b) => !b.out);
+    const activeShoots = d.shoots.filter((b) => !b.out);
+    const activeGems = d.gems.filter((b) => !b.out);
 
     if (!d.particles) {
         d.particles = new Particles(context);
@@ -32,11 +35,11 @@ export function render(canvas, brickColors, d) {
     context.fill();
     context.closePath();
 
-    // if shooting enabled
+    // draw cannons
     if (d.shooting.munition > 0) {
         context.beginPath();
         context.rect(
-            d.paddle.x + d.paddle.width/2 - 20,
+            d.paddle.x + d.paddle.width / 2 - 20,
             d.paddle.y - d.paddle.height - 10,
             40,
             10
@@ -45,58 +48,44 @@ export function render(canvas, brickColors, d) {
         context.closePath();
     }
 
-
-    for(const ball of d.balls) {
-        if (!ball.out) {
-            drawBall(context, ball);
-        }
+    // draw Balls
+    for (const ball of activeBalls) {
+        drawBall(context, ball);
     }
 
     context.fillStyle = '#dedede';
 
-    // draw bricks
-    for (let brick of d.bricks.filter((b) => !b.hit)) {
+    // draw Bricks
+    for (let brick of activeBricks) {
         context.fillStyle = brickColors[brick.gemType];
-
         context.beginPath();
-        context.shadowColor = 'red';
-        //context.shadowBlur = 15;
         context.strokeStyle = '#ffffff';
         context.lineWidth = 2;
         context.rect(brick.x, brick.y, brick.width, brick.height);
         context.fill();
         context.stroke();
-        //Blur = 0;
-
         context.closePath();
     }
 
-    for (let gem of d.gems) {
-        if (!gem.out) {
-            context.fillStyle = brickColors[gem.type];
-
-            context.beginPath();
-            context.shadowColor = 'red';
-            // context.shadowBlur = 15;
-            context.strokeStyle = '#ffffff';
-            context.lineWidth = 2;
-            context.rect(gem.x, gem.y, gem.width, gem.height);
-            context.fill();
-            context.stroke();
-            context.shadowBlur = 0;
-
-            context.closePath();
-        }
+    // draw Gems
+    for (let gem of activeGems) {
+        context.fillStyle = brickColors[gem.type];
+        context.beginPath();
+        context.strokeStyle = '#ffffff';
+        context.lineWidth = 2;
+        context.rect(gem.x, gem.y, gem.width, gem.height);
+        context.fill();
+        context.stroke();
+        context.closePath();
     }
 
-    for (let shoot of d.shoots) {
-        if (!shoot.used) {
-            context.fillStyle = 'red';
-            context.beginPath();
-            context.arc(shoot.x, shoot.y, 4, 0, Math.PI * 2);
-            context.fill();
-            context.closePath();
-        }
+    // draw Shoots
+    for (let shoot of activeShoots) {
+        context.fillStyle = 'red';
+        context.beginPath();
+        context.arc(shoot.x, shoot.y, 4, 0, Math.PI * 2);
+        context.fill();
+        context.closePath();
     }
 
     d.particles.draw();

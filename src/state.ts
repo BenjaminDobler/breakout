@@ -22,7 +22,6 @@ function intersects(rect1, rect2) {
 
 function handleBall(state, ball) {
     if (ball.y > state.height) {
-        // state.balls = state.balls.filter((b) => b !== ball);
         ball.out = true;
     } else {
         if (ball.y < 0) {
@@ -64,8 +63,10 @@ function newInitialBall(state) {
 }
 
 export function calculateState(acc, [[tick, pos], shoot]) {
-
-    const activeBalls = acc.balls.filter(b => !b.out);
+    const activeBalls = acc.balls.filter((b) => !b.out);
+    const activeBricks = acc.bricks.filter((b) => !b.out);
+    const activeShoots = acc.shoots.filter((s) => !shoot.out);
+    const activeGems = acc.gems.filter((g) => !g.out);
 
     if (acc.state === 'LEVEL_DONE') {
         console.log('level done ');
@@ -82,16 +83,15 @@ export function calculateState(acc, [[tick, pos], shoot]) {
         acc.state === 'GAME_OVER'
     ) {
         acc.shoots.forEach((shoot) => {
-            shoot.used = true;
+            shoot.out = true;
         });
 
         acc.gems.forEach((gem) => {
             gem.out = true;
-            gem.used = true;
         });
         acc.paddle.x = pos;
 
-        for (const ball of acc.balls) {
+        for (const ball of activeBalls) {
             ball.x = acc.paddle.x + acc.paddle.width / 2;
             ball.y = acc.paddle.y - 15;
         }
@@ -119,22 +119,21 @@ export function calculateState(acc, [[tick, pos], shoot]) {
             if (acc.lives > 0) {
                 newInitialBall(acc);
                 acc.state = 'AFTER_LIVE_LOST';
-                
             } else {
                 newInitialBall(acc);
                 acc.state = 'GAME_OVER';
             }
         }
 
-        for (const ball of acc.balls) {
+        for (const ball of activeBalls) {
             handleBall(acc, ball);
         }
 
-        for (let brick of acc.bricks.filter((b) => !b.hit)) {
-            for (let ball of acc.balls) {
+        for (let brick of activeBricks) {
+            for (let ball of activeBalls) {
                 const collide = collision(brick, ball);
                 if (collide) {
-                    brick.hit = true;
+                    brick.out = true;
                     ball.directionY *= -1;
                     if (acc.particles) {
                         acc.particles.addExplosion(ball.x, ball.y);
@@ -156,9 +155,7 @@ export function calculateState(acc, [[tick, pos], shoot]) {
             }
         }
 
-        const gems = acc.gems.filter((g) => !g.out);
-
-        for (let gem of gems) {
+        for (let gem of activeGems) {
             gem.y += 2;
             if (gem.y > acc.height) {
                 gem.out = true;
@@ -202,24 +199,21 @@ export function calculateState(acc, [[tick, pos], shoot]) {
             }
         }
 
-        const activeBricks = acc.bricks.filter((b) => !b.hit);
-        for (let shoot of acc.shoots) {
-            if (!shoot.used) {
-                for (let brick of activeBricks) {
-                    if (
-                        shoot.x > brick.x &&
-                        shoot.x < brick.x + brick.width &&
-                        shoot.y > brick.y &&
-                        shoot.y < brick.y + brick.height
-                    ) {
-                        brick.hit = true;
-                        shoot.used = true;
-                    }
+        for (let shoot of activeShoots) {
+            for (let brick of activeBricks) {
+                if (
+                    shoot.x > brick.x &&
+                    shoot.x < brick.x + brick.width &&
+                    shoot.y > brick.y &&
+                    shoot.y < brick.y + brick.height
+                ) {
+                    brick.out = true;
+                    shoot.out = true;
                 }
-                shoot.y -= 5;
-                if (shoot.y < 0) {
-                    shoot.used = true;
-                }
+            }
+            shoot.y -= 5;
+            if (shoot.y < 0) {
+                shoot.out = true;
             }
         }
 
